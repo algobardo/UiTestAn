@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    flatDir {
+       dirs 'lib'
+   	}
+}
+
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'scala'
+
+dependencies {
+	compile 'org.scala-lang:scala-library:2.11.1'
+	compile 'org.parboiled:parboiled_2.11:2.0.1'
+    compile 'com.google.android.tools:ddmlib:r13'
+	compile name:"soot-trunk"
+	compile name:"com.microsoft.z3"
+    compile name:"javaparser-1.0.12-SNAPSHOT"
+	runtime files("lib/libz3.dylib")
+	runtime files("lib/libz3java.dylib")
+}
+
+
+task "runprogram"(type: JavaExec, dependsOn: classes) { 
+            main = 'entry'
+            args = []
+            classpath sourceSets.main.runtimeClasspath
+            classpath configurations.runtime
+} 
+
+apply plugin:'application'
+mainClassName = "entry"
+
+
+run {
+    configureRun(it)
+}
+
+void configureRun(def task) {
+    task.systemProperty "java.library.path", "./lib/native/"
+}
